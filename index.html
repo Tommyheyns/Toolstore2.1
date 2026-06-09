@@ -114,7 +114,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.94);backdrop-
 .inv-group-title{font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:7px}
 .inv-group-count{background:var(--surface);border-radius:10px;padding:2px 7px;font-size:9px}
 
-/* COMPLETED CSS FROM CUTOFF */
+/* INVENTORY ITEM CSS */
 .inv-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;transition:border-color 0.2s;}
 .inv-item:active {border-color: var(--accent);}
 .inv-info {display: flex; flex-direction: column; gap: 4px;}
@@ -131,12 +131,13 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.94);backdrop-
 </header>
 
 <div class="tabs">
-    <button class="tab active" onclick="switchTab('scan')">Scan / Add</button>
-    <button class="tab" onclick="switchTab('inventory')">Inventory</button>
+    <button class="tab active" onclick="switchTab(event, 'scan')">Scan / Add</button>
+    <button class="tab" onclick="switchTab(event, 'inventory')">Inventory</button>
 </div>
 
 <!-- PAGE: SCAN / HOME -->
 <div id="page-scan" class="page active">
+    <!-- Mode Selection Buttons -->
     <div class="home-btns">
         <div class="home-btn active-mode" id="mode-add" onclick="switchMode('add')">
             <span class="home-btn-icon">📦</span>
@@ -150,6 +151,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.94);backdrop-
         </div>
     </div>
 
+    <!-- Scan Area -->
     <div class="scan-zone" id="scanZone" onclick="document.getElementById('fileInput').click()">
         <span class="scan-icon">📸</span>
         <div class="scan-label" id="scanLabel">
@@ -167,7 +169,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.94);backdrop-
         <div class="thinking-msg">AI is identifying part...</div>
     </div>
 
-    <!-- RESULT CARD (For Add Mode) -->
+    <!-- RESULT CARD (Shows when 'Add New' is selected and scanned) -->
     <div class="result-card" id="resultCard">
         <div class="result-header">
             Item Details <span class="conf-badge conf-high">98% Match</span>
@@ -217,7 +219,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.94);backdrop-
         </div>
     </div>
 
-    <!-- ADJUST CARD (For Adjust Mode) -->
+    <!-- ADJUST CARD (Shows when 'Adjust' is selected and scanned) -->
     <div class="adjust-card" id="adjustCard">
         <div class="adj-header">Match Found</div>
         <div class="adj-match">
@@ -277,14 +279,16 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.94);backdrop-
     let baseQty = 4;
     let newQty = 4;
 
-    function switchTab(tabId) {
+    // Handles switching between the top tabs (Scan / Inventory)
+    function switchTab(event, tabId) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         
-        event.target.classList.add('active');
+        event.currentTarget.classList.add('active');
         document.getElementById('page-' + tabId).classList.add('active');
     }
 
+    // Handles switching between 'Add New' and 'Adjust' modes
     function switchMode(mode) {
         currentMode = mode;
         document.querySelectorAll('.home-btn').forEach(btn => btn.classList.remove('active-mode'));
@@ -292,6 +296,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.94);backdrop-
         resetScan();
     }
 
+    // Handles image upload preview
     function handleImage(event) {
         const file = event.target.files<a href="" class="citation-link" target="_blank" style="vertical-align: super; font-size: 0.8em; margin-left: 3px;">[0]</a>;
         if (file) {
@@ -307,11 +312,12 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.94);backdrop-
         }
     }
 
+    // Simulates the AI scanning process
     function processScan() {
         document.getElementById('scanBtn').style.display = 'none';
         document.getElementById('thinkingArea').classList.add('show');
 
-        // Simulate AI processing delay
+        // Simulate AI processing delay (1.5 seconds)
         setTimeout(() => {
             document.getElementById('thinkingArea').classList.remove('show');
             if (currentMode === 'add') {
@@ -325,6 +331,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.94);backdrop-
         }, 1500);
     }
 
+    // Resets the scanner back to default state
     function resetScan() {
         document.getElementById('previewImg').src = '';
         document.getElementById('previewImg').style.display = 'none';
@@ -337,6 +344,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.94);backdrop-
         document.getElementById('fileInput').value = '';
     }
 
+    // Changes the quantity in "Adjust" mode
     function changeQty(amount) {
         if (newQty + amount >= 0) {
             newQty += amount;
@@ -344,10 +352,12 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.94);backdrop-
         }
     }
 
+    // Updates the text to show how many items are being added/removed
     function updateQtyDisplay() {
         document.getElementById('adjQty').innerText = newQty;
         const diff = newQty - baseQty;
         const descEl = document.getElementById('adjDesc');
+        
         if (diff === 0) {
             descEl.innerText = "No changes pending";
             descEl.style.color = "var(--muted)";
