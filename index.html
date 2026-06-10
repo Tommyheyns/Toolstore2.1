@@ -2972,8 +2972,11 @@ function closeImportModal(e){
 function parseCSV(text){
   const lines = text.trim().split('\n');
   if(lines.length < 2) return [];
-  // Handle quoted fields
+  // Auto-detect delimiter: tab or comma
+  const firstLine = lines[0];
+  const delimiter = firstLine.includes('\t') ? '\t' : ',';
   function parseLine(line){
+    if(delimiter==='\t') return line.split('\t').map(f=>f.replace(/^"|"$/g,'').trim());
     const fields = [];
     let cur = '', inQ = false;
     for(let i=0; i<line.length; i++){
@@ -3007,11 +3010,12 @@ function mapRow(row){
   const grade = (row['Grade']||'').trim();
   const shape = (row['Shape']||'').trim();
   const notes = (row['Notes']||'').trim();
-  const coolant = (row['Coolant Through']||row['coolant_through']||'').trim();
+  // Accept truncated Excel column names too
+  const coolant = (row['Coolant Through']||row['Coolant']||row['coolant_through']||row['coolant']||'').trim();
   const desc = (row['Description']||row['description']||'').trim();
-  const material = (row['Material Application']||row['material_application']||row['material']||'').trim();
-  const drillDepth = (row['Drill Depth']||row['drill_depth']||'').trim();
-  const tapType = (row['Tap Type']||row['tap_type']||'').trim();
+  const material = (row['Material Application']||row['Material']||row['material_application']||row['material']||'').trim();
+  const drillDepth = (row['Drill Depth']||row['DrillDepth']||row['drill_depth']||'').trim();
+  const tapType = (row['Tap Type']||row['TapType']||row['tap_type']||'').trim();
   
   // Map category names from spreadsheet to app cat keys
   const catMap = {
